@@ -1,0 +1,19 @@
+{
+  "name": "My Awesome page_action Extension",
+  "version": "1.0",
+  "description": "Build an Extension!",
+  "permissions": ["storage", "activeTab"],
+  "content_scripts":[
+    {
+      "js":["content.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "background" : {
+    "scripts" : ["background.js"]
+  },
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+  "manifest_version":2
+}
