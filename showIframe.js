@@ -33,7 +33,8 @@ if (!document.getElementById("iframe-extension")) {
 
   mask.ondrop = function(e){
     var elemento = e.dataTransfer.getData("text");
-    console.log(getElementByXpath('//' + elemento))
+    const domToTransfer = getElementByXpath('//' + elemento)
+    iframe.contentWindow.postMessage(elemento, "*")
   };
 
 }
@@ -45,3 +46,8 @@ else{
     document.getElementById("iframe-extension").style.visibility = "hidden"
   }
 }
+// window.onmessage = function(e){
+//     if (e.data == 'hello') {
+//         alert('It works!');
+//     }
+// };

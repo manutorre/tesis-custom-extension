@@ -1,8 +1,8 @@
 document.onreadystatechange = function () {
-  const bla = document.querySelectorAll("h1, h2, h3")
+  const bla = document.querySelectorAll("h1, h2, h3, p, a")
   function getPathTo(element) {
-      if (element.id!=='')
-          return 'id("'+element.id+'")';
+      // if (element.id!=='')
+      //     return 'id("'+element.id+'")';
       if (element===document.body)
           return element.tagName;
 
@@ -17,7 +17,7 @@ document.onreadystatechange = function () {
       }
   }
   Array.prototype.forEach.call(bla, function(item){
-    item.style.backgroundColor = "red";
+    // item.style.backgroundColor = "red";
     item.setAttribute('draggable', true);
     item.ondragstart = function(e) {
       e.dataTransfer.setData("text", getPathTo(e.target))
