@@ -19,8 +19,66 @@ document.onreadystatechange = function () {
   Array.prototype.forEach.call(bla, function(item){
     // item.style.backgroundColor = "red";
     item.setAttribute('draggable', true);
+
     item.ondragstart = function(e) {
-      e.dataTransfer.setData("text", getPathTo(e.target))
+    	var target=e.target;
+          //Marca en rojo todos los p hermanos buscando desde el body
+            var walkDOM = function (node,func) {
+                      func(node);                     
+                      node = node.firstChild;
+                      while(node) {
+                          walkDOM(node,func);
+                          node = node.nextSibling;
+                      }
+
+                  };  
+                walkDOM(document.body,function(node) {
+                      
+                      var childs = node.childNodes;
+                      var cantP=0;
+                        for (var i= 0; i<childs.length; i++) {
+                            var child= childs[i];
+                            if(child.tagName==="P") //Tener en cuenta tmb los text: child.nodeType===3 ||            
+                              cantP+=1;
+                        }
+                        if(cantP>=2){
+                          var siblings = node.getElementsByTagName("P");
+                          for (var i= 0; i<siblings.length; i++) {
+                            var sibling= siblings[i];
+                            sibling.style.backgroundColor = "red";
+                          }
+                        }
+                  });
+
+
+          var padre;
+          function getNoticias(element){
+            //preguntar tmb por si el padre tiene mas hijos o si el h2 tiene hermanos p
+            var siblings = element.parentNode.childNodes;
+            if (siblings.length>1){
+              for (var i= 0; i<siblings.length; i++) {
+                var sibling= siblings[i];
+                if(sibling.tagName === "A"){
+                  padre=element.parentNode;
+                }
+              }
+              if(padre){
+                var elementos = document.getElementsByClassName(padre.getAttribute("class"));
+                  for (var i= 0; i<elementos.length; i++) {
+                    var noticia = elementos[i];
+                    noticia.style.backgroundColor = "red";
+                  }
+              }else{
+                getNoticias(element.parentNode);  
+              }
+            }else{
+              getNoticias(element.parentNode);
+            }    
+          }
+
+          getNoticias(target);
+
+      	  e.dataTransfer.setData("text", getPathTo(e.target))
     };
   })
 }
