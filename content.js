@@ -1,5 +1,5 @@
 document.onreadystatechange = function () {
-  const bla = document.querySelectorAll("h1, h2, h3, p, a")
+  const bla = document.querySelectorAll("h1, h2, h3, p, a, header")
   function getPathTo(element) {
       // if (element.id!=='')
       //     return 'id("'+element.id+'")';
@@ -24,21 +24,21 @@ document.onreadystatechange = function () {
     	var target=e.target;
           //Marca en rojo todos los p hermanos buscando desde el body
             var walkDOM = function (node,func) {
-                      func(node);                     
+                      func(node);
                       node = node.firstChild;
                       while(node) {
                           walkDOM(node,func);
                           node = node.nextSibling;
                       }
 
-                  };  
+                  };
                 walkDOM(document.body,function(node) {
-                      
+
                       var childs = node.childNodes;
                       var cantP=0;
                         for (var i= 0; i<childs.length; i++) {
                             var child= childs[i];
-                            if(child.tagName==="P") //Tener en cuenta tmb los text: child.nodeType===3 ||            
+                            if(child.tagName==="P") //Tener en cuenta tmb los text: child.nodeType===3 ||
                               cantP+=1;
                         }
                         if(cantP>=2){
@@ -54,6 +54,7 @@ document.onreadystatechange = function () {
           var padre;
           function getNoticias(element){
             //preguntar tmb por si el padre tiene mas hijos o si el h2 tiene hermanos p
+            console.log(element)
             var siblings = element.parentNode.childNodes;
             if (siblings.length>1){
               for (var i= 0; i<siblings.length; i++) {
@@ -63,17 +64,20 @@ document.onreadystatechange = function () {
                 }
               }
               if(padre){
-                var elementos = document.getElementsByClassName(padre.getAttribute("class"));
-                  for (var i= 0; i<elementos.length; i++) {
-                    var noticia = elementos[i];
+                console.log(padre.tagName)
+                var elementos = document.getElementsByTagName(padre.tagName);
+                for (var i= 0; i<elementos.length; i++) {
+                  var noticia = elementos[i];
+                  if (typeof DeepDiff(noticia.childNodes,padre.childNodes) == "undefined") {
                     noticia.style.backgroundColor = "red";
                   }
+                }
               }else{
-                getNoticias(element.parentNode);  
+                getNoticias(element.parentNode);
               }
             }else{
               getNoticias(element.parentNode);
-            }    
+            }
           }
 
           getNoticias(target);

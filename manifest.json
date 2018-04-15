@@ -5,12 +5,12 @@
   "permissions": ["storage", "activeTab"],
   "content_scripts":[
     {
-      "js":["content.js"],
+      "js":["content.js", "deep-diff.min.js"],
       "matches": ["<all_urls>"]
     }
   ],
   "background" : {
-    "scripts" : ["background.js"]
+    "scripts" : ["background.js", "deep-diff.min.js"]
   },
   "browser_action": {
     "default_icon": "icon.png"
