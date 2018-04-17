@@ -32,14 +32,15 @@ document.onreadystatechange = function () {
                       while(node) {
                           walkDOM(node,func);
                           node = node.nextElementSibling;
-                      }
-                      if(node == document.body.lastElementChild){
+                        if(node == document.body.lastElementChild){
                           var siblings = nodeMax.getElementsByTagName("P");
                           for (var i= 0; i<siblings.length; i++) {
                             var sibling= siblings[i];
                             sibling.style.backgroundColor = "red";
                           }
                       }
+                      }
+                 
 
                   };
                 walkDOM(document.body,function(node) {
