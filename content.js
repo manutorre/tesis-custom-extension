@@ -22,75 +22,40 @@ document.onreadystatechange = function () {
 
     item.ondragstart = function(e) {
     	var target=e.target;
-          //Marca en rojo todos los p hermanos buscando desde el body
-            var nodeMax;
-            var maxP = 0;
-            var walkDOM = function (node,func) {
-
-                      func(node);
-                      node = node.firstElementChild;
-                      while(node) {
-                          walkDOM(node,func);
-                          node = node.nextElementSibling;
-                        if(node == document.body.lastElementChild){
-                          var siblings = nodeMax.getElementsByTagName("P");
-                          for (var i= 0; i<siblings.length; i++) {
-                            var sibling= siblings[i];
-                            sibling.style.backgroundColor = "red";
-                          }
-                      }
-                      }
-                 
-
-                  };
-                walkDOM(document.body,function(node) {
-
-                      var childs = node.children;
-                      var cantP=0;
-                        for (var i= 0; i<childs.length; i++) {
-                            var child= childs[i];
-                            if(child.tagName==="P") //Tener en cuenta tmb los text: child.nodeType===3 ||
-                              cantP+=1;
-                        }
-
-                        if(cantP > maxP){
-                          maxP = cantP;
-                          nodeMax = node;
-                        }
-                  });
-
-          var padre;
-          function getNoticias(element){
-            //preguntar tmb por si el padre tiene mas hijos o si el h2 tiene hermanos p
-            console.log(element)
-            var siblings = element.parentNode.childNodes;
-            if (siblings.length>1){
+    	//Marca en rojo todos los p hermanos buscando desde el body
+      var nodeMax;
+      var maxP = 0;
+      var walkDOM = function (node,func) {
+          func(node);
+          node = node.firstElementChild;
+          while(node) {
+            walkDOM(node,func);
+            node = node.nextElementSibling;
+            if(node == document.body.lastElementChild){
+              var siblings = nodeMax.getElementsByTagName("P");
               for (var i= 0; i<siblings.length; i++) {
                 var sibling= siblings[i];
-                if(sibling.tagName === "A"){
-                  padre=element.parentNode;
-                }
+                sibling.style.backgroundColor = "red";
               }
-              if(padre){
-                console.log(padre.tagName)
-                var elementos = document.getElementsByTagName(padre.tagName);
-                for (var i= 0; i<elementos.length; i++) {
-                  var noticia = elementos[i];
-                  if (typeof DeepDiff(noticia.childNodes,padre.childNodes) == "undefined") {
-                    noticia.style.backgroundColor = "red";
-                  }
-                }
-              }else{
-                getNoticias(element.parentNode);
-              }
-            }else{
-              getNoticias(element.parentNode);
             }
           }
-
-          getNoticias(target);
-
-      	  e.dataTransfer.setData("text", getPathTo(e.target))
+      };
+      
+      walkDOM(document.body,function(node) {
+        var childs = node.children;
+        var cantP=0;
+        for (var i= 0; i<childs.length; i++) {
+          var child= childs[i];
+          if(child.tagName==="P") //Tener en cuenta tmb los text: child.nodeType===3 ||
+            cantP+=1;
+        }
+        if(cantP > maxP){
+          maxP = cantP;
+          nodeMax = node;
+        }
+      });
+       
+      e.dataTransfer.setData("text", getPathTo(e.target))
     };
   })
 }
