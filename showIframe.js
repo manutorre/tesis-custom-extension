@@ -2,7 +2,7 @@
 if (!document.getElementById("iframe-extension")) {
   var iframe = document.createElement('iframe');
   iframe.src = "http://localhost:3000";
-  iframe.sandbox = "allow-scripts";
+  iframe.sandbox = "allow-scripts allow-modals allow-popups";
   iframe.style.position = "fixed";
   iframe.style.right = "50px";
   iframe.style.top = "50px";
