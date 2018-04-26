@@ -73,6 +73,19 @@ if (!document.getElementById("iframe-extension")) {
             }
           }      
 
+  function findElementA(element){
+    console.log(element)
+    var siblings = element.parentNode.childNodes;
+    if (siblings.length>1){
+      for (var i= 0; i<siblings.length; i++) {
+        var sibling= siblings[i];
+        if(sibling.tagName === "A"){
+          return sibling;
+        }
+      }
+      return findElementA(element.parentNode);
+    }
+  }
 
   var seleccion;        
   mask.ondragover = function(e){
@@ -87,8 +100,52 @@ if (!document.getElementById("iframe-extension")) {
     else{
       var elemento = e.dataTransfer.getData("text");
       if(seleccion === "notice"){
-        //Falta meter la funcion que trae todos los elementos p del contenido, aca solo mando el path de un titulo arrastrado
-        iframe.contentWindow.postMessage(elemento, "*");
+        var elementA = findElementA(getElementByXpath('//' + elemento)).getAttribute("href");//Obtengo el link del <a>
+        var popup = window.open(elementA, '_blank', 'width=500,height=500');//Puede cargar en un pop-up o en una nueva pestaña
+
+        popup.onload = function() {
+          setTimeout(function(){ 
+            //console.log(popup.document.documentElement.outerHTML)
+            
+            //Marca en rojo todos los p hermanos buscando desde el body
+            var nodeMax;
+            var maxP = 0;
+            var contenido="";
+            var walkDOM = function (node,func) {
+                func(node);
+                node = node.firstElementChild;
+                while(node) {
+                  walkDOM(node,func);
+                  node = node.nextElementSibling;
+                  if(node == popup.document.body.lastElementChild){
+                    var siblings = nodeMax.getElementsByTagName("P");
+                    for (var i= 0; i<siblings.length; i++) {
+                      var sibling= siblings[i];
+                      contenido +=sibling.textContent+"\n";
+                      //sibling.style.backgroundColor = "red";
+                    }
+                    console.log("Contenido: ",contenido);
+                    iframe.contentWindow.postMessage(contenido, "*");
+                    popup.close();
+                  }
+                }
+            };
+            
+            walkDOM(popup.document.body,function(node) {
+              var childs = node.children;
+              var cantP=0;
+              for (var i= 0; i<childs.length; i++) {
+                var child= childs[i];
+                if(child.tagName==="P") //Tener en cuenta tmb los text: child.nodeType===3 ||
+                  cantP+=1;
+              }
+              if(cantP > maxP){
+                maxP = cantP;
+                nodeMax = node;
+              }
+            });
+          }, 2000);
+        }
         seleccion="";
       }else{
         var paths=[];
