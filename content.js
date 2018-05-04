@@ -1,5 +1,5 @@
 document.onreadystatechange = function () {
-  const bla = document.querySelectorAll("h1, h2, h3, p, a, header")
+  const bla = document.querySelectorAll("h1, h2, h3, p")
   function getPathTo(element) {
       // if (element.id!=='')
       //     return 'id("'+element.id+'")';
@@ -40,7 +40,7 @@ document.onreadystatechange = function () {
             }
           }
       };
-      
+
       walkDOM(document.body,function(node) {
         var childs = node.children;
         var cantP=0;
@@ -54,7 +54,7 @@ document.onreadystatechange = function () {
           nodeMax = node;
         }
       });
-       
+
       e.dataTransfer.setData("text", getPathTo(e.target))
     };
   })

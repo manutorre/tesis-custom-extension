@@ -99,24 +99,43 @@ if (!document.getElementById("iframe-extension")) {
   }
   else{
     const elemento = e.dataTransfer.getData("text");
-    if (seleccion === "titleRecognizing") {
-      const elementText = findElementA(getElementByXpath('//' + elemento)).querySelectorAll("h1, h2, h3, h4, h5")[0].textContent
+    if (seleccion === "titleAndLinkRecognizing") {
+      const titleText = getElementByXpath('//' + elemento).textContent
+      const linkHref = findElementA(getElementByXpath('//' + elemento)).getAttribute("href")
       iframe.contentWindow.postMessage(
         {
-          type:"title",
-          data:elemento,
-          text:elementText
-        }, "*");
+          type:"titleAndLink",
+          title:{
+            type:"title",
+            data:elemento,
+            text:titleText
+          },
+          link:{
+            type:"link",
+            data: getPathTo(findElementA(getElementByXpath('//' + elemento))),
+            text:linkHref
+          }
+        }
+        , "*");
     }
-    if (seleccion === "linkRecognizing") {
-      const elementText = findElementA(getElementByXpath('//' + elemento)).getAttribute("href")
-      iframe.contentWindow.postMessage(
-        {
-          type:"link",
-          data:elemento,
-          text:elementText
-        }, "*");
-    }
+    // if (seleccion === "titleRecognizing") {
+    //   const elementText = getElementByXpath('//' + elemento).textContent
+    //   iframe.contentWindow.postMessage(
+    //     {
+    //       type:"title",
+    //       data:elemento,
+    //       text:elementText
+    //     }, "*");
+    // }
+    // if (seleccion === "linkRecognizing") {
+    //   const elementText = findElementA(getElementByXpath('//' + elemento)).getAttribute("href")
+    //   iframe.contentWindow.postMessage(
+    //     {
+    //       type:"link",
+    //       data:elemento,
+    //       text:elementText
+    //     }, "*");
+    // }
     if(seleccion === "notice"){
       var elementA = findElementA(getElementByXpath('//' + elemento)).getAttribute("href");//Obtengo el link del <a>
       var popup = window.open(elementA, '_blank', 'width=500,height=500');//Puede cargar en un pop-up o en una nueva pestaña
