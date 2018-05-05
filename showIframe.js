@@ -75,15 +75,19 @@ if (!document.getElementById("iframe-extension")) {
     }
 
   function findElementA(element){
-    var siblings = element.parentNode.childNodes;
-    if (siblings.length>1){
-      for (var i= 0; i<siblings.length; i++) {
-        var sibling= siblings[i];
-        if(sibling.tagName === "A"){
-          return sibling;
+    if(element.tagName === "A"){
+      return element;
+    }else{
+      var siblings = element.parentNode.childNodes;
+      if (siblings.length>1){
+        for (var i= 0; i<siblings.length; i++) {
+          var sibling= siblings[i];
+          if(sibling.tagName === "A"){
+            return sibling;
+          }
         }
+        return findElementA(element.parentNode);
       }
-      return findElementA(element.parentNode);
     }
   }
 
