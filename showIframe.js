@@ -116,7 +116,7 @@ if (!document.getElementById("iframe-extension")) {
           },
           link:{
             type:"link",
-            data: getPathTo(findElementA(getElementByXpath('//' + elemento))),
+            data: (getPathTo(findElementA(getElementByXpath('//' + elemento)))).toLowerCase(),
             text:linkHref
           }
         }
