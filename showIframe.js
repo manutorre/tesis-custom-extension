@@ -102,7 +102,7 @@ if (!document.getElementById("iframe-extension")) {
     alert("Primero se debe seleccionar una opcion");
   }
   else{
-    const elemento = e.dataTransfer.getData("text");
+    const elemento = e.dataTransfer.getData("text").toLowerCase();
     if (seleccion === "titleAndLinkRecognizing") {
       const titleText = getElementByXpath('//' + elemento).textContent
       const linkHref = findElementA(getElementByXpath('//' + elemento)).getAttribute("href")
