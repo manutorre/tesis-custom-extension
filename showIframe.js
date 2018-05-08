@@ -13,14 +13,14 @@ if (!document.getElementById("iframe-extension")) {
 
   var mask = document.createElement('div');
   mask.style.position = "fixed";
-  mask.style.right = "102px";
-  mask.style.top = "300px";
-  mask.style.height = "145px";
-  mask.style.width = "212px";
+  mask.style.height = "500px";
+  mask.style.width = "300px";
   mask.id = "iframe-mask";
   mask.background = "transparent";
   mask.style.display = "none";
   mask.style.zIndex = "501";
+  mask.style.right = "50px";
+  mask.style.top = "50px";
   document.body.appendChild(mask);
 
   var getElementByXpath = function(path) {
