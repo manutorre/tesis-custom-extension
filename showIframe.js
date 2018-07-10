@@ -16,20 +16,24 @@ if (!document.getElementById("iframe-extension")) {
   mask.style.height = "500px";
   mask.style.width = "300px";
   mask.id = "iframe-mask";
-  mask.background = "transparent";
-  mask.style.display = "none";
+  //mask.background = "transparent";
+  //mask.style.display = "none";
   mask.style.zIndex = "501";
   mask.style.right = "50px";
   mask.style.top = "50px";
+  var urlString = chrome.extension.getURL('Drag-elements.jpg');
+  var img = document.createElement('img');
+  img.src = urlString
+  mask.appendChild(img)
   document.body.appendChild(mask);
 
   var getElementByXpath = function(path) {
     return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   }
-  // mask.ondragstart = function(e) {
-  //   console.log(e.target.id)
-  //   e.dataTransfer.setData("text", e.target.id);
-  // };
+  mask.ondragstart = function(e) {
+    console.log(e.target.id)
+    e.dataTransfer.setData("text", e.target.id);
+  };
   function getPathTo(element) {
     // if (element.id!=='')
     //     return 'id("'+element.id+'")';
@@ -210,12 +214,15 @@ if (!document.getElementById("iframe-extension")) {
     switch (message) {
       case "hideMask":
         mask.style.display = "none"
+        iframe.style.display = "block"
         break;
       case "showMask":
         mask.style.display = "block"
+        iframe.style.display = "none"
         break;
       case "maskForNewContent":
         mask.style.display = "block"
+        iframe.style.display = "none"
         break;
       default:
     }
