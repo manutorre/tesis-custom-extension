@@ -17,7 +17,7 @@ if (!document.getElementById("iframe-extension")) {
   mask.style.width = "300px";
   mask.id = "iframe-mask";
   //mask.background = "transparent";
-  //mask.style.display = "none";
+  mask.style.display = "none";
   mask.style.zIndex = "501";
   mask.style.right = "50px";
   mask.style.top = "50px";
@@ -26,6 +26,8 @@ if (!document.getElementById("iframe-extension")) {
   img.src = urlString
   mask.appendChild(img)
   document.body.appendChild(mask);
+
+//CREADO DE ELEMENTOS IFRAME Y MASK
 
   var getElementByXpath = function(path) {
     return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
@@ -106,6 +108,7 @@ if (!document.getElementById("iframe-extension")) {
     alert("Primero se debe seleccionar una opcion");
   }
   else{
+    debugger
     const elemento = e.dataTransfer.getData("text").toLowerCase();
     if (seleccion === "titleAndLinkRecognizing") {
       const titleText = getElementByXpath('//' + elemento).textContent
@@ -211,6 +214,7 @@ if (!document.getElementById("iframe-extension")) {
   });//console.log(e.data)
 
   function handleMessage(message){
+    console.log(message)
     switch (message) {
       case "hideMask":
         mask.style.display = "none"
@@ -224,6 +228,9 @@ if (!document.getElementById("iframe-extension")) {
         mask.style.display = "block"
         iframe.style.display = "none"
         break;
+      case "section":
+        mask.style.display = "block"
+        iframe.style.display = "none"
       default:
     }
   }
