@@ -110,7 +110,7 @@ if (!document.getElementById("iframe-extension")) {
   else{
     debugger
     const elemento = e.dataTransfer.getData("text").toLowerCase();
-    if (seleccion === "titleAndLinkRecognizing") {
+      if (seleccion === "titleAndLinkRecognizing") {
       const titleText = getElementByXpath('//' + elemento).textContent
       const linkHref = findElementA(getElementByXpath('//' + elemento)).getAttribute("href")
       iframe.contentWindow.postMessage(
