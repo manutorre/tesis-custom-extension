@@ -108,7 +108,6 @@ if (!document.getElementById("iframe-extension")) {
     alert("Primero se debe seleccionar una opcion");
   }
   else{
-    debugger
     const elemento = e.dataTransfer.getData("text").toLowerCase();
     if (seleccion === "titleAndLinkRecognizing") {
       const titleText = getElementByXpath('//' + elemento).textContent
@@ -214,7 +213,6 @@ if (!document.getElementById("iframe-extension")) {
   });//console.log(e.data)
 
   function handleMessage(message){
-    console.log(message)
     switch (message) {
       case "hideMask":
         mask.style.display = "none"
