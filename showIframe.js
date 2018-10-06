@@ -1,7 +1,7 @@
 
 if (!document.getElementById("iframe-extension")) {
   var iframe = document.createElement('iframe');
-  iframe.src = "http://localhost:3000";
+  iframe.src = chrome.extension.getURL("contentParser/index.html");
   iframe.sandbox = "allow-scripts allow-modals allow-popups";
   iframe.style.position = "fixed";
   iframe.style.right = "50px";
@@ -123,7 +123,8 @@ if (!document.getElementById("iframe-extension")) {
           link:{
             type:"link",
             data: (getPathTo(findElementA(getElementByXpath('//' + elemento)))).toLowerCase(),
-            text:linkHref
+            text:linkHref,
+            url:location.host
           }
         }
         , "*");

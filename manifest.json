@@ -16,6 +16,6 @@
     "default_icon": "icon.png"
   },
   "manifest_version":2,
-  "web_accessible_resources": ["*.jpg"]
-
+  "web_accessible_resources": ["*.jpg", "/contentParser/index.html", "/contentAdmin/index.html"],
+  "content_security_policy": "script-src 'self' 'unsafe-eval' 'unsafe-inline'"
 }
