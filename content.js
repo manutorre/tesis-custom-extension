@@ -1,5 +1,5 @@
 document.onreadystatechange = function () {
-  const bla = document.querySelectorAll("h1, h2, h3, p")
+  const bla = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, a, article")
   function getPathTo(element) {
       // if (element.id!=='')
       //     return 'id("'+element.id+'")';
@@ -21,8 +21,14 @@ document.onreadystatechange = function () {
     item.setAttribute('draggable', true);
 
     item.ondragstart = function(e) {
-    	var target=e.target;
-    	//Marca en rojo todos los p hermanos buscando desde el body
+      e.dataTransfer.setData("text", getPathTo(e.target))
+    };
+  })
+}
+
+/*
+      var target=e.target;
+      //Marca en rojo todos los p hermanos buscando desde el body
       var nodeMax;
       var maxP = 0;
       var walkDOM = function (node,func) {
@@ -55,13 +61,10 @@ document.onreadystatechange = function () {
         }
       });
 
-      e.dataTransfer.setData("text", getPathTo(e.target))
-    };
-  })
-}
-// window.onload = function() {
-//     var iframe = document.createElement('iframe');
-//     iframe.src = "https://twitter.com";
-//     iframe.style.position = "absolute";
-//     document.body.appendChild(iframe);
-// };
+    window.onload = function() {
+     var iframe = document.createElement('iframe');
+     iframe.src = "https://twitter.com";
+     iframe.style.position = "absolute";
+     document.body.appendChild(iframe);
+ };
+*/

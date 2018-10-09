@@ -32,10 +32,6 @@ if (!document.getElementById("iframe-extension")) {
   var getElementByXpath = function(path) {
     return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   }
-  mask.ondragstart = function(e) {
-    console.log(e.target.id)
-    e.dataTransfer.setData("text", e.target.id);
-  };
   function getPathTo(element) {
     // if (element.id!=='')
     //     return 'id("'+element.id+'")';
@@ -53,7 +49,122 @@ if (!document.getElementById("iframe-extension")) {
     }
   }
 
-  function getNoticias(element,paths,padre){
+  function findElement(element,tag){
+    if(element.tagName === tag){
+      return element;
+    }else{
+      var siblings = element.parentNode.childNodes;
+      if (siblings.length>1){
+        for (var i= 0; i<siblings.length; i++) {
+          var sibling= siblings[i];
+          if(sibling.tagName === tag){
+            return sibling;
+          }
+        }
+        return findElementA(element.parentNode);
+      }
+    }
+  }
+
+  mask.ondragstart = function(e) {
+    console.log(e.target.id)
+    e.dataTransfer.setData("text", e.target.id);
+  };
+  
+  mask.ondragover = function(e){
+    e.preventDefault()
+  };
+  
+  var seleccion;
+  mask.ondrop = function(e){
+
+    if(!seleccion){
+      alert("Primero se debe seleccionar una opcion");
+    }
+    else{
+        const elemento = e.dataTransfer.getData("text").toLowerCase();
+        if (seleccion.mge === "titleAndLinkRecognizing") {
+          const titleText = getElementByXpath('//' + elemento).textContent
+          const link = findElement(getElementByXpath('//' + elemento),"A")
+          iframe.contentWindow.postMessage(
+            {
+              type:"titleAndLink",
+              title:{
+                type:"title",
+                data:elemento,
+                text:titleText
+              },
+              link:{
+                type:"link",
+                data: getPathTo(link).toLowerCase(),
+                url:link.getAttribute("href"),
+                className:link.getAttribute("class"),
+                tagName:(findElement(getElementByXpath('//' + elemento),"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName
+              }
+            }
+            , "*");
+        }
+        
+      }
+  };
+
+  window.addEventListener('message', (e) => {
+    seleccion=e.data
+    console.log("seleccion ",seleccion)
+    handleMessage(seleccion)
+  });//console.log(e.data)
+
+  function handleMessage(message){
+    switch (message.mge) {
+      case "hideMask":
+        mask.style.display = "none"
+        iframe.style.display = "block"
+        break;
+      case "showMask":
+        mask.style.display = "block"
+        iframe.style.display = "none"
+        break;
+      case "maskForNewContent":
+        mask.style.display = "block"
+        iframe.style.display = "none"
+        break;
+      case "className":
+        const siblingsClass = [...document.getElementsByClassName(message.elem)]
+        const siblings=[];
+        siblingsClass.map((content,index)=>{
+          siblings[index] = getPathTo(content)
+        })
+        iframe.contentWindow.postMessage({type:"className",pathsElem:siblings},"*")
+      break;
+      case "tagName":
+        const siblingsTag = [...document.getElementsByTagName(message.elem)]
+        const siblingsT=[];
+        siblingsTag.map((content,index)=>{
+          siblingsT[index] = getPathTo(content)
+        })
+        iframe.contentWindow.postMessage({type:"tagName",pathsElem:siblingsT},"*")
+      break;
+      case "section":
+        mask.style.display = "block"
+        iframe.style.display = "none"
+      default:
+    }
+  }
+}
+else{
+  if (document.getElementById("iframe-extension").style.visibility == "hidden") {
+    document.getElementById("iframe-extension").style.visibility = "visible"
+  }
+  else{
+    document.getElementById("iframe-extension").style.visibility = "hidden"
+  }
+}
+
+
+
+/*
+
+function getNoticias(element,paths,padre){
       //preguntar tmb por si el padre tiene mas hijos o si el h2 tiene hermanos p
       var siblings = element.parentNode.childNodes;
       if (siblings.length>1){
@@ -80,54 +191,13 @@ if (!document.getElementById("iframe-extension")) {
       }
     }
 
-  function findElementA(element){
-    if(element.tagName === "A"){
-      return element;
-    }else{
-      var siblings = element.parentNode.childNodes;
-      if (siblings.length>1){
-        for (var i= 0; i<siblings.length; i++) {
-          var sibling= siblings[i];
-          if(sibling.tagName === "A"){
-            return sibling;
-          }
-        }
-        return findElementA(element.parentNode);
-      }
-    }
-  }
 
-  var seleccion;
-  mask.ondragover = function(e){
-    e.preventDefault()
-  };
+// window.onmessage = function(e){
+//     if (e.data == 'hello') {
+//         alert('It works!');
+//     }
+// };
 
-  mask.ondrop = function(e){
-
-  if(!seleccion){
-    alert("Primero se debe seleccionar una opcion");
-  }
-  else{
-    const elemento = e.dataTransfer.getData("text").toLowerCase();
-      if (seleccion === "titleAndLinkRecognizing") {
-      const titleText = getElementByXpath('//' + elemento).textContent
-      const linkHref = findElementA(getElementByXpath('//' + elemento)).getAttribute("href")
-      iframe.contentWindow.postMessage(
-        {
-          type:"titleAndLink",
-          title:{
-            type:"title",
-            data:elemento,
-            text:titleText
-          },
-          link:{
-            type:"link",
-            data: (getPathTo(findElementA(getElementByXpath('//' + elemento)))).toLowerCase(),
-            text:linkHref
-          }
-        }
-        , "*");
-    }
     // if (seleccion === "titleRecognizing") {
     //   const elementText = getElementByXpath('//' + elemento).textContent
     //   iframe.contentWindow.postMessage(
@@ -145,7 +215,8 @@ if (!document.getElementById("iframe-extension")) {
     //       data:elemento,
     //       text:elementText
     //     }, "*");
-    // }
+     
+
     if(seleccion === "notice"){
       var elementA = findElementA(getElementByXpath('//' + elemento)).getAttribute("href");//Obtengo el link del <a>
       var popup = window.open(elementA, '_blank', 'width=500,height=500');//Puede cargar en un pop-up o en una nueva pestaña
@@ -193,6 +264,7 @@ if (!document.getElementById("iframe-extension")) {
           });
         }, 2000);
       }
+      
       seleccion="";
     }else{
       var paths=[];
@@ -200,50 +272,9 @@ if (!document.getElementById("iframe-extension")) {
       getNoticias(getElementByXpath('//' + elemento),paths,padre);
       iframe.contentWindow.postMessage(paths, "*");
       seleccion="";
-    }
-  }
+    }*/
+  
     //Crear funciones dependiendo de lo que seleccione el usuario en la extension: si selecciona
     //noticia, hacer el postmessage con el string, si selecciona seccion, postmessage con el array, etc
     //iframe.contentWindow.postMessage(getElementByXpath('//' + elemento).textContent,"*");
-  };
-
-  window.addEventListener('message', (e) => {
-    seleccion=e.data
-    handleMessage(e.data)
-  });//console.log(e.data)
-
-  function handleMessage(message){
-    switch (message) {
-      case "hideMask":
-        mask.style.display = "none"
-        iframe.style.display = "block"
-        break;
-      case "showMask":
-        mask.style.display = "block"
-        iframe.style.display = "none"
-        break;
-      case "maskForNewContent":
-        mask.style.display = "block"
-        iframe.style.display = "none"
-        break;
-      case "section":
-        mask.style.display = "block"
-        iframe.style.display = "none"
-      default:
-    }
-  }
-
-}
-else{
-  if (document.getElementById("iframe-extension").style.visibility == "hidden") {
-    document.getElementById("iframe-extension").style.visibility = "visible"
-  }
-  else{
-    document.getElementById("iframe-extension").style.visibility = "hidden"
-  }
-}
-// window.onmessage = function(e){
-//     if (e.data == 'hello') {
-//         alert('It works!');
-//     }
-// };
+  
