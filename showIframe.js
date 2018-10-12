@@ -61,7 +61,7 @@ if (!document.getElementById("iframe-extension")) {
             return sibling;
           }
         }
-        return findElementA(element.parentNode);
+        return findElement(element.parentNode,tag);
       }
     }
   }
@@ -95,10 +95,11 @@ if (!document.getElementById("iframe-extension")) {
                 text:titleText
               },
               link:{
+                urlPagina: document.URL,
                 type:"link",
                 data: getPathTo(link).toLowerCase(),
                 url:link.getAttribute("href"),
-                className:link.getAttribute("class"),
+                className:(link.getAttribute("class"))?link.getAttribute("class"):getElementByXpath('//' + elemento).getAttribute("class"),
                 tagName:(findElement(getElementByXpath('//' + elemento),"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName
               }
             }
