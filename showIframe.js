@@ -99,7 +99,7 @@ if (!document.getElementById("iframe-extension")) {
                 type:"link",
                 data: getPathTo(link).toLowerCase(),
                 url:link.getAttribute("href"),
-                className:(link.getAttribute("class"))?link.getAttribute("class"):getElementByXpath('//' + elemento).getAttribute("class"),
+                className:(link.getAttribute("class"))?link.getAttribute("class"):findElement(getElementByXpath('//' + elemento),'DIV').getAttribute("class"),
                 tagName:(findElement(getElementByXpath('//' + elemento),"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName
               }
             }
