@@ -30,23 +30,71 @@ if (!document.getElementById("iframe-extension")) {
 //CREADO DE ELEMENTOS IFRAME Y MASK
 
   var getElementByXpath = function(path) {
-    return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    console.log(path)
+    const elemento = document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; 
+    return elemento.closest("a")
   }
-  function getPathTo(element) {
-    // if (element.id!=='')
-    //     return 'id("'+element.id+'")';
-    if (element===document.body)
-        return element.tagName;
+  // function getPathTo(element) {
+  //   console.log(element)
+  //   if (element.id!=='')
+  //       return 'id("'+element.id+'")';
+  //   if (element===document.body)
+  //       return element.tagName;
 
-    var ix= 0;
-    var siblings= element.parentNode.childNodes;
-    for (var i= 0; i<siblings.length; i++) {
-        var sibling= siblings[i];
-        if (sibling===element)
-            return getPathTo(element.parentNode)+'/'+element.tagName+'['+(ix+1)+']';
-        if (sibling.nodeType===1 && sibling.tagName===element.tagName)
-            ix++;
+  //   var ix= 0;
+  //   var siblings= element.parentNode.childNodes;
+  //   for (var i= 0; i<siblings.length; i++) {
+  //       var sibling= siblings[i];
+  //       if (sibling===element)
+  //           return getPathTo(element.parentNode)+'/'+element.tagName+'['+(ix+1)+']';
+  //       if (sibling.nodeType===1 && sibling.tagName===element.tagName)
+  //           ix++;
+  //   }
+  // }
+
+  function getPathTo(element){
+    console.log(element)
+    if (element && element.id)
+        return '//*[@id="' + element.id + '"]';
+    else
+        return getElementTreeXPath(element);  
+  }
+
+  function getElementTreeXPath(element){
+    var paths = [];  // Use nodeName (instead of localName) 
+    // so namespace prefix is included (if any).
+    for (; element && element.nodeType == Node.ELEMENT_NODE; 
+           element = element.parentNode)
+    {
+        var index = 0;
+        var hasFollowingSiblings = false;
+        for (var sibling = element.previousSibling; sibling; 
+              sibling = sibling.previousSibling)
+        {
+            // Ignore document type declaration.
+            if (sibling.nodeType == Node.DOCUMENT_TYPE_NODE)
+                continue;
+
+            if (sibling.nodeName == element.nodeName)
+                ++index;
+        }
+
+        for (var sibling = element.nextSibling; 
+            sibling && !hasFollowingSiblings;
+            sibling = sibling.nextSibling)
+        {
+            if (sibling.nodeName == element.nodeName)
+                hasFollowingSiblings = true;
+        }
+
+        var tagName = (element.prefix ? element.prefix + ":" : "") 
+                          + element.localName;
+        var pathIndex = (index || hasFollowingSiblings ? "[" 
+                   + (index + 1) + "]" : "");
+        paths.splice(0, 0, tagName + pathIndex);
     }
+
+    return paths.length ? "/" + paths.join("/") : null;
   }
 
   function findElementInChilds(element,tag){
@@ -86,17 +134,32 @@ if (!document.getElementById("iframe-extension")) {
   }
 
   mask.ondragstart = function(e) {
+    e.preventDefault()
+    e.stopPropagation();
     console.log(e.target.id)
     e.dataTransfer.setData("text", e.target.id);
   };
-  
+
+  mask.ondragenter = function(e){
+    e.preventDefault()
+    e.stopPropagation();
+  };  
+
   mask.ondragover = function(e){
     e.preventDefault()
+    e.stopPropagation();
   };
   
+  mask.ondragend = function(e){
+    e.preventDefault()
+    e.stopPropagation();
+  };  
+
   var seleccion;
   mask.ondrop = function(e){
-
+    console.log(e)
+    e.preventDefault()
+    e.stopPropagation();    
     if(!seleccion){
       alert("Primero se debe seleccionar una opcion");
     }
@@ -104,8 +167,11 @@ if (!document.getElementById("iframe-extension")) {
         const elemento = e.dataTransfer.getData("text").toLowerCase();
         if (seleccion.mge === "titleAndLinkRecognizing") {
           const elem = getElementByXpath('//' + elemento)
+          console.log(elem)
           const titleText = elem.textContent
-          const link = (findElementInChilds(elem,"A") != null) ? findElementInChilds(elem,"A") : findElement(elem,"A") 
+          console.log(titleText)
+          // const link = (findElementInChilds(elem,"A") != null) ? findElementInChilds(elem,"A") : findElement(elem,"A") 
+          const link = elem.closest("a")
           iframe.contentWindow.postMessage(
             {
               type:"titleAndLink",
@@ -119,8 +185,10 @@ if (!document.getElementById("iframe-extension")) {
                 type:"link",
                 data: getPathTo(link).toLowerCase(),
                 url:link.getAttribute("href"),
-                tagName:(findElement(elem,"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName,
-                className:(link.getAttribute("class"))? link.getAttribute("class") : findElement(elem,'DIV').getAttribute("class")
+                tagName:link.tagName,
+                // tagName:(findElement(elem,"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName,
+                className:(link.getAttribute("class"))? link.getAttribute("class") : ""
+                // className:(link.getAttribute("class"))? link.getAttribute("class") : findElement(elem,'DIV').getAttribute("class")
               }
             }
             , "*");

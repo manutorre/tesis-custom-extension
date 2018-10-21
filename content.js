@@ -19,8 +19,26 @@ document.onreadystatechange = function () {
   Array.prototype.forEach.call(bla, function(item){
     // item.style.backgroundColor = "red";
     item.setAttribute('draggable', true);
-
+    item.ondragover = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    item.ondragend = function(e){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    item.ondragenter = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    item.ondrop = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     item.ondragstart = function(e) {
+      console.log(e.target)
+      console.log(getPathTo(e.target))
+      // e.dataTransfer.setData("text", getPathTo(e.target))
       e.dataTransfer.setData("text", getPathTo(e.target))
     };
   })
