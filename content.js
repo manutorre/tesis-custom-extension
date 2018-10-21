@@ -1,5 +1,5 @@
 document.onreadystatechange = function () {
-  const bla = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, a, article")
+  const bla = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, article")
   function getPathTo(element) {
       // if (element.id!=='')
       //     return 'id("'+element.id+'")';

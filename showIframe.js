@@ -49,21 +49,40 @@ if (!document.getElementById("iframe-extension")) {
     }
   }
 
-  function findElement(element,tag){
+  function findElementInChilds(element,tag){
     if(element.tagName === tag){
-      return element;
-    }else{
-      var siblings = element.parentNode.childNodes;
-      if (siblings.length>1){
-        for (var i= 0; i<siblings.length; i++) {
-          var sibling= siblings[i];
-          if(sibling.tagName === tag){
-            return sibling;
+        return element;
+    }
+    else{
+      var children = element.childNodes
+      if (children.length>0){
+        for (var i= 0; i<children.length; i++) {
+          var child= children[i];
+          if(child.tagName === tag){
+            return child;
           }
         }
-        return findElement(element.parentNode,tag);
       }
+      return null;
     }
+  }
+
+  function findElement(element,tag){
+    if(element.tagName === tag){
+        return element;
+    }
+    else{
+        var siblings = element.parentNode.childNodes;
+        if (siblings.length>1){
+          for (var i= 0; i<siblings.length; i++) {
+            var sibling= siblings[i];
+            if(sibling.tagName === tag){
+              return sibling;
+            }
+          }
+          return findElement(element.parentNode,tag);
+        }
+      }
   }
 
   mask.ondragstart = function(e) {
@@ -84,8 +103,9 @@ if (!document.getElementById("iframe-extension")) {
     else{
         const elemento = e.dataTransfer.getData("text").toLowerCase();
         if (seleccion.mge === "titleAndLinkRecognizing") {
-          const titleText = getElementByXpath('//' + elemento).textContent
-          const link = findElement(getElementByXpath('//' + elemento),"A")
+          const elem = getElementByXpath('//' + elemento)
+          const titleText = elem.textContent
+          const link = (findElementInChilds(elem,"A") != null) ? findElementInChilds(elem,"A") : findElement(elem,"A") 
           iframe.contentWindow.postMessage(
             {
               type:"titleAndLink",
@@ -99,8 +119,8 @@ if (!document.getElementById("iframe-extension")) {
                 type:"link",
                 data: getPathTo(link).toLowerCase(),
                 url:link.getAttribute("href"),
-                className:(link.getAttribute("class"))?link.getAttribute("class"):findElement(getElementByXpath('//' + elemento),'DIV').getAttribute("class"),
-                tagName:(findElement(getElementByXpath('//' + elemento),"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName
+                tagName:(findElement(elem,"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName,
+                className:(link.getAttribute("class"))? link.getAttribute("class") : findElement(elem,'DIV').getAttribute("class")
               }
             }
             , "*");
@@ -145,9 +165,6 @@ if (!document.getElementById("iframe-extension")) {
         })
         iframe.contentWindow.postMessage({type:"tagName",pathsElem:siblingsT},"*")
       break;
-      case "section":
-        mask.style.display = "block"
-        iframe.style.display = "none"
       default:
     }
   }
