@@ -31,28 +31,27 @@ if (!document.getElementById("iframe-extension")) {
 
   var getElementByXpath = function(path) {
     console.log(path)
-    const elemento = document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; 
-    return elemento.closest("a")
+    return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; 
   }
-  // function getPathTo(element) {
-  //   console.log(element)
-  //   if (element.id!=='')
-  //       return 'id("'+element.id+'")';
-  //   if (element===document.body)
-  //       return element.tagName;
 
-  //   var ix= 0;
-  //   var siblings= element.parentNode.childNodes;
-  //   for (var i= 0; i<siblings.length; i++) {
-  //       var sibling= siblings[i];
-  //       if (sibling===element)
-  //           return getPathTo(element.parentNode)+'/'+element.tagName+'['+(ix+1)+']';
-  //       if (sibling.nodeType===1 && sibling.tagName===element.tagName)
-  //           ix++;
-  //   }
-  // }
+  function getPathTo(element) {
+      // if (element.id!=='')
+      //     return 'id("'+element.id+'")';
+      if (element===document.body)
+          return element.tagName;
 
-  function getPathTo(element){
+      var ix= 0;
+      var siblings= element.parentNode.childNodes;
+      for (var i= 0; i<siblings.length; i++) {
+          var sibling= siblings[i];
+          if (sibling===element)
+              return getPathTo(element.parentNode)+'/'+element.tagName+'['+(ix+1)+']';
+          if (sibling.nodeType===1 && sibling.tagName===element.tagName)
+              ix++;
+      }
+  }
+
+  /*function getPathTo(element){
     console.log(element)
     if (element && element.id)
         return '//*[@id="' + element.id + '"]';
@@ -96,8 +95,9 @@ if (!document.getElementById("iframe-extension")) {
 
     return paths.length ? "/" + paths.join("/") : null;
   }
+  */
 
-  function findElementInChilds(element,tag){
+  /*function findElementInChilds(element,tag){
     if(element.tagName === tag){
         return element;
     }
@@ -132,7 +132,7 @@ if (!document.getElementById("iframe-extension")) {
         }
       }
   }
-
+  */
   mask.ondragstart = function(e) {
     e.preventDefault()
     e.stopPropagation();
@@ -170,8 +170,10 @@ if (!document.getElementById("iframe-extension")) {
           console.log(elem)
           const titleText = elem.textContent
           console.log(titleText)
-          // const link = (findElementInChilds(elem,"A") != null) ? findElementInChilds(elem,"A") : findElement(elem,"A") 
           const link = elem.closest("a")
+
+          // const link = (findElementInChilds(elem,"A") != null) ? findElementInChilds(elem,"A") : findElement(elem,"A") 
+          
           iframe.contentWindow.postMessage(
             {
               type:"titleAndLink",
@@ -185,9 +187,9 @@ if (!document.getElementById("iframe-extension")) {
                 type:"link",
                 data: getPathTo(link).toLowerCase(),
                 url:link.getAttribute("href"),
-                tagName:link.tagName,
+                tagName: link.closest("article").tagName ? link.closest("article").tagName : link.tagName,
                 // tagName:(findElement(elem,"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName,
-                className:(link.getAttribute("class"))? link.getAttribute("class") : ""
+                className: link.closest("article").getAttribute("class")? link.closest("article").getAttribute("class") : link.closest("div").getAttribute("class")
                 // className:(link.getAttribute("class"))? link.getAttribute("class") : findElement(elem,'DIV').getAttribute("class")
               }
             }
