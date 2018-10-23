@@ -187,9 +187,10 @@ if (!document.getElementById("iframe-extension")) {
                 type:"link",
                 data: getPathTo(link).toLowerCase(),
                 url:link.getAttribute("href"),
-                tagName: link.closest("article").tagName ? link.closest("article").tagName : link.tagName,
+                tagName: link.closest("article") != null ? link.closest("article").tagName : link.tagName,
                 // tagName:(findElement(elem,"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName,
-                className: link.closest("article").getAttribute("class")? link.closest("article").getAttribute("class") : link.closest("div").getAttribute("class")
+                className: link.closest("article") != null ? link.closest("article").getAttribute("class") : 
+                           link.parentNode.closest("[class]").getAttribute("class") != null ? link.parentNode.closest("[class]").getAttribute("class") : link.getAttribute("class") 
                 // className:(link.getAttribute("class"))? link.getAttribute("class") : findElement(elem,'DIV').getAttribute("class")
               }
             }
