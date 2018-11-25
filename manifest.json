@@ -5,17 +5,16 @@
   "permissions": ["storage", "activeTab"],
   "content_scripts":[
     {
-      "js":["content.js", "deep-diff.min.js"],
+      "js":["DOMPresentationUtils.js", "content.js", "deep-diff.min.js"],
       "matches": ["<all_urls>"]
     }
   ],
   "background" : {
-    "scripts" : ["background.js", "deep-diff.min.js"]
+    "scripts" : ["DOMPresentationUtils.js", "background.js", "deep-diff.min.js"]
   },
   "browser_action": {
     "default_icon": "icon.png"
   },
   "manifest_version":2,
-  "web_accessible_resources": ["*.jpg"]
-
+  "web_accessible_resources": ["*.jpg", "/contentParser/index.html", "/contentAdmin/index.html"]
 }

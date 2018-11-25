@@ -1,7 +1,8 @@
 
 if (!document.getElementById("iframe-extension")) {
   var iframe = document.createElement('iframe');
-  iframe.src = "http://localhost:3000";
+  iframe.src = chrome.extension.getURL("contentParser/index.html");
+  // iframe.src = "http://localhost:3000"
   iframe.sandbox = "allow-scripts allow-modals allow-popups";
   iframe.style.position = "fixed";
   iframe.style.right = "50px";
@@ -34,22 +35,27 @@ if (!document.getElementById("iframe-extension")) {
     return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; 
   }
 
-  function getPathTo(element) {
-      // if (element.id!=='')
-      //     return 'id("'+element.id+'")';
-      if (element===document.body)
-          return element.tagName;
-
-      var ix= 0;
-      var siblings= element.parentNode.childNodes;
-      for (var i= 0; i<siblings.length; i++) {
-          var sibling= siblings[i];
-          if (sibling===element)
-              return getPathTo(element.parentNode)+'/'+element.tagName+'['+(ix+1)+']';
-          if (sibling.nodeType===1 && sibling.tagName===element.tagName)
-              ix++;
-      }
+  function getPathTo(element){
+    console.log(WebInspector.DOMPresentationUtils.xPath(element, true))
+    return WebInspector.DOMPresentationUtils.xPath(element, true)
   }
+
+  // function getPathTo(element) {
+  //     // if (element.id!=='')
+  //     //     return 'id("'+element.id+'")';
+  //     if (element===document.body)
+  //         return element.tagName;
+
+  //     var ix= 0;
+  //     var siblings= element.parentNode.childNodes;
+  //     for (var i= 0; i<siblings.length; i++) {
+  //         var sibling= siblings[i];
+  //         if (sibling===element)
+  //             return getPathTo(element.parentNode)+'/'+element.tagName+'['+(ix+1)+']';
+  //         if (sibling.nodeType===1 && sibling.tagName===element.tagName)
+  //             ix++;
+  //     }
+  // }
 
   /*function getPathTo(element){
     console.log(element)
