@@ -1,8 +1,8 @@
 
 if (!document.getElementById("iframe-extension")) {
   var iframe = document.createElement('iframe');
-  // iframe.src = chrome.extension.getURL("contentParser/index.html");
-  iframe.src = "http://localhost:3000"
+  iframe.src = chrome.extension.getURL("contentParser/index.html");
+  // iframe.src = "http://localhost:3000"
   iframe.sandbox = "allow-scripts allow-modals allow-popups";
   iframe.style.position = "fixed";
   iframe.style.right = "50px";
