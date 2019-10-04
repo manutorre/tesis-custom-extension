@@ -1,4 +1,5 @@
-document.onreadystatechange = function () {
+function eventHandler() {
+  console.log("------Llama------")
   const bla = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, a, article")
   function getPathTo(element) {
       // if (element.id!=='')
@@ -16,7 +17,8 @@ document.onreadystatechange = function () {
               ix++;
       }
   }
-  Array.prototype.forEach.call(bla, function(item){
+
+  bla.forEach(function(item,index,array){
     // item.style.backgroundColor = "red";
     item.setAttribute('draggable', true);
     item.ondragover = function(e) {
@@ -41,8 +43,17 @@ document.onreadystatechange = function () {
       // e.dataTransfer.setData("text", getPathTo(e.target))
       e.dataTransfer.setData("text", getPathTo(e.target))
     };
-  })
+    
+    if(index === array.length - 1){
+      setTimeout(function(){
+        eventHandler()},20000)
+    }
+  },this) 
+
 }
+
+document.onload = eventHandler()
+
 
 /*
       var target=e.target;
