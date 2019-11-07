@@ -3,23 +3,23 @@ if (!document.getElementById("iframe-extension")) {
   var iframe = document.createElement('iframe');
   iframe.src = chrome.extension.getURL("contentParser/index.html");
   // iframe.src = "http://localhost:3000"
-  iframe.sandbox = "allow-scripts allow-modals allow-popups";
+  iframe.sandbox = "allow-scripts allow-modals allow-popups allow-same-origin";
   iframe.style.position = "fixed";
   iframe.style.right = "50px";
   iframe.style.top = "50px";
   iframe.style.height = "500px";
-  iframe.style.zIndex = "500";
+  iframe.style.zIndex = "10000";
   iframe.id = "iframe-extension";
   document.body.appendChild(iframe);
 
   var mask = document.createElement('div');
   mask.style.position = "fixed";
-  mask.style.height = "500px";
-  mask.style.width = "300px";
+  mask.style.height = "203px";
+  mask.style.width = "314px";
   mask.id = "iframe-mask";
   //mask.background = "transparent";
   mask.style.display = "none";
-  mask.style.zIndex = "501";
+  mask.style.zIndex = "10001";
   mask.style.right = "50px";
   mask.style.top = "50px";
   var urlString = chrome.extension.getURL('Drag-elements.jpg');
@@ -39,6 +39,124 @@ if (!document.getElementById("iframe-extension")) {
     console.log(WebInspector.DOMPresentationUtils.xPath(element, true))
     return WebInspector.DOMPresentationUtils.xPath(element, true)
   }
+
+  mask.ondragstart = function(e) {
+    e.preventDefault()
+    e.stopPropagation();
+    console.log(e.target.id)
+    e.dataTransfer.setData("text", e.target.id);
+  };
+
+  mask.ondragenter = function(e){
+    e.preventDefault()
+    e.stopPropagation();
+  };  
+
+  mask.ondragover = function(e){
+    e.preventDefault()
+    e.stopPropagation();
+  };
+  
+  mask.ondragend = function(e){
+    e.preventDefault()
+    e.stopPropagation();
+  };  
+
+  var seleccion;
+  mask.ondrop = function(e){
+    console.log(e)
+    e.preventDefault()
+    e.stopPropagation();    
+    if(!seleccion){
+      alert("Primero se debe seleccionar una opcion");
+    }
+    else{
+        const elemento = e.dataTransfer.getData("text").toLowerCase();
+        if (seleccion.mge === "titleAndLinkRecognizing") {
+          const elem = getElementByXpath('//' + elemento)
+          console.log(elem)
+          const titleText = elem.textContent
+          console.log(titleText)
+          const link = elem.closest("a")
+
+          // const link = (findElementInChilds(elem,"A") != null) ? findElementInChilds(elem,"A") : findElement(elem,"A") 
+          
+          iframe.contentWindow.postMessage(
+            {
+              type:"titleAndLink",
+              title:{
+                type:"title",
+                data:elemento,
+                text:titleText
+              },
+              link:{
+                urlPagina: document.URL,
+                type:"link",
+                data: (link != null) ? getPathTo(link).toLowerCase() : getPathTo(elem)/*,
+                url:link.getAttribute("href"),
+                tagName: link.closest("article") != null ? link.closest("article").tagName : link.tagName,
+                // tagName:(findElement(elem,"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName,
+                className: link.closest("article") != null ? link.closest("article").getAttribute("class") : 
+                           link.parentNode.closest("[class]").getAttribute("class") != null ? link.parentNode.closest("[class]").getAttribute("class") : link.getAttribute("class") 
+                // className:(link.getAttribute("class"))? link.getAttribute("class") : findElement(elem,'DIV').getAttribute("class")
+              */
+              }
+            }
+            , "*");
+        }
+        
+      }
+  };
+
+  window.addEventListener('message', (e) => {
+    seleccion=e.data
+    console.log("seleccion ",seleccion)
+    handleMessage(seleccion)
+  });//console.log(e.data)
+
+  function handleMessage(message){
+    switch (message.mge) {
+      case "hideMask":
+        mask.style.display = "none"
+        iframe.style.display = "block"
+        break;
+      case "showMask":
+        mask.style.display = "block"
+        iframe.style.display = "none"
+        break;
+      case "maskForNewContent":
+        mask.style.display = "block"
+        iframe.style.display = "none"
+        break;
+      case "className":
+        const siblingsClass = [...document.getElementsByClassName(message.elem)]
+        const siblings=[];
+        siblingsClass.map((content,index)=>{
+          siblings[index] = getPathTo(content)
+        })
+        iframe.contentWindow.postMessage({type:"className",pathsElem:siblings},"*")
+      break;
+      case "tagName":
+        const siblingsTag = [...document.getElementsByTagName(message.elem)]
+        const siblingsT=[];
+        siblingsTag.map((content,index)=>{
+          siblingsT[index] = getPathTo(content)
+        })
+        iframe.contentWindow.postMessage({type:"tagName",pathsElem:siblingsT},"*")
+      break;
+      default:
+    }
+  }
+}
+else{
+  if (document.getElementById("iframe-extension").style.visibility == "hidden") {
+    document.getElementById("iframe-extension").style.visibility = "visible"
+  }
+  else{
+    document.getElementById("iframe-extension").style.visibility = "hidden"
+  }
+}
+
 
   // function getPathTo(element) {
   //     // if (element.id!=='')
@@ -139,123 +257,6 @@ if (!document.getElementById("iframe-extension")) {
       }
   }
   */
-  mask.ondragstart = function(e) {
-    e.preventDefault()
-    e.stopPropagation();
-    console.log(e.target.id)
-    e.dataTransfer.setData("text", e.target.id);
-  };
-
-  mask.ondragenter = function(e){
-    e.preventDefault()
-    e.stopPropagation();
-  };  
-
-  mask.ondragover = function(e){
-    e.preventDefault()
-    e.stopPropagation();
-  };
-  
-  mask.ondragend = function(e){
-    e.preventDefault()
-    e.stopPropagation();
-  };  
-
-  var seleccion;
-  mask.ondrop = function(e){
-    console.log(e)
-    e.preventDefault()
-    e.stopPropagation();    
-    if(!seleccion){
-      alert("Primero se debe seleccionar una opcion");
-    }
-    else{
-        const elemento = e.dataTransfer.getData("text").toLowerCase();
-        if (seleccion.mge === "titleAndLinkRecognizing") {
-          const elem = getElementByXpath('//' + elemento)
-          console.log(elem)
-          const titleText = elem.textContent
-          console.log(titleText)
-          const link = elem.closest("a")
-
-          // const link = (findElementInChilds(elem,"A") != null) ? findElementInChilds(elem,"A") : findElement(elem,"A") 
-          
-          iframe.contentWindow.postMessage(
-            {
-              type:"titleAndLink",
-              title:{
-                type:"title",
-                data:elemento,
-                text:titleText
-              },
-              link:{
-                urlPagina: document.URL,
-                type:"link",
-                data: getPathTo(link).toLowerCase(),
-                url:link.getAttribute("href"),
-                tagName: link.closest("article") != null ? link.closest("article").tagName : link.tagName,
-                // tagName:(findElement(elem,"ARTICLE").tagName == "ARTICLE") ? "ARTICLE" : link.tagName,
-                className: link.closest("article") != null ? link.closest("article").getAttribute("class") : 
-                           link.parentNode.closest("[class]").getAttribute("class") != null ? link.parentNode.closest("[class]").getAttribute("class") : link.getAttribute("class") 
-                // className:(link.getAttribute("class"))? link.getAttribute("class") : findElement(elem,'DIV').getAttribute("class")
-              }
-            }
-            , "*");
-        }
-        
-      }
-  };
-
-  window.addEventListener('message', (e) => {
-    seleccion=e.data
-    console.log("seleccion ",seleccion)
-    handleMessage(seleccion)
-  });//console.log(e.data)
-
-  function handleMessage(message){
-    switch (message.mge) {
-      case "hideMask":
-        mask.style.display = "none"
-        iframe.style.display = "block"
-        break;
-      case "showMask":
-        mask.style.display = "block"
-        iframe.style.display = "none"
-        break;
-      case "maskForNewContent":
-        mask.style.display = "block"
-        iframe.style.display = "none"
-        break;
-      case "className":
-        const siblingsClass = [...document.getElementsByClassName(message.elem)]
-        const siblings=[];
-        siblingsClass.map((content,index)=>{
-          siblings[index] = getPathTo(content)
-        })
-        iframe.contentWindow.postMessage({type:"className",pathsElem:siblings},"*")
-      break;
-      case "tagName":
-        const siblingsTag = [...document.getElementsByTagName(message.elem)]
-        const siblingsT=[];
-        siblingsTag.map((content,index)=>{
-          siblingsT[index] = getPathTo(content)
-        })
-        iframe.contentWindow.postMessage({type:"tagName",pathsElem:siblingsT},"*")
-      break;
-      default:
-    }
-  }
-}
-else{
-  if (document.getElementById("iframe-extension").style.visibility == "hidden") {
-    document.getElementById("iframe-extension").style.visibility = "visible"
-  }
-  else{
-    document.getElementById("iframe-extension").style.visibility = "hidden"
-  }
-}
-
-
 
 /*
 

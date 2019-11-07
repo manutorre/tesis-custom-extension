@@ -1,6 +1,6 @@
 function eventHandler() {
   console.log("------Llama------")
-  const bla = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, a, article")
+  const bla = document.querySelectorAll("h1, h2, h3, h4, h5, h6, p, span, a, article")
   function getPathTo(element) {
       // if (element.id!=='')
       //     return 'id("'+element.id+'")';
